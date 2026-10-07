@@ -4,13 +4,13 @@ namespace RougeLike.Models;
 
 public class Player(int x, int y, char symbol) : LevelElement(x, y, symbol, ConsoleColor.Magenta)
 {
-    public void Update(List<LevelElement> elements)
+    public void Update()
     {
         Position direction = new();
         do
         {
             direction = GetPlayerDirection();
-            if (!WillCollide(direction, elements)) break;
+            if (!WillCollide(direction)) break;
 
         } while (true);
        
@@ -18,7 +18,11 @@ public class Player(int x, int y, char symbol) : LevelElement(x, y, symbol, Cons
         if(Position.X + direction.X < 0 || Position.Y + direction.Y < 0) return;
         //Erase old position
         Move(direction);
+        
+
     }
+    
+    
 
     bool IsValidInput(ConsoleKey key)
     {

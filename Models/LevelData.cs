@@ -4,13 +4,14 @@ namespace RougeLike.Models;
 
 public class LevelData
 {
-    private readonly List<LevelElement> _elements = [];
+    private static readonly List<LevelElement> _elements = [];
 
     //Kan inte exponera det privata fältet och använda readonly samtidigt.
-    public List<LevelElement> Elements => _elements;
+    public static List<LevelElement> Elements => _elements;
+    public static Player Player => Elements.OfType<Player>().First();
     
 
-    public void Load(string path)
+    public static void Load(string path)
     {
         string[] lines = File.ReadAllLines(path);
         for(int y = 0; y < lines.Length; y++)
@@ -41,7 +42,7 @@ public class LevelData
                 
                 if(element != null)
                 {
-                    element.Show();
+                    
                     _elements.Add(element);
                 }
             }

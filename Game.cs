@@ -1,18 +1,19 @@
 using RougeLike.Models;
+using RougeLike.Models.Enemies;
 
 namespace RougeLike;
 
 public class Game
 {
-    LevelData levelData = new LevelData();
-    Player player => levelData.Elements.OfType<Player>().First();
+    Player player => LevelData.Elements.OfType<Player>().First();
+    
 
     public void Start()
     {
-        levelData.Load($"{Environment.CurrentDirectory}/map.txt");
+        LevelData.Load($"{Environment.CurrentDirectory}/map.txt");
         Console.Clear();
         Console.CursorVisible = false;
-        levelData.Elements.ForEach(e => e.Draw());
+        LevelData.Elements.ForEach(e => e.Draw());
         Loop();
     }
     
@@ -20,9 +21,12 @@ public class Game
     {
         while (true)
         {
-            player.Update(levelData.Elements);
+            player.Update();
             //Kollar ifall det finns ett element i riktningen som man försöker gå till
-            
+            foreach (LevelElement element in LevelData.Elements)
+            {
+                element.Update();
+            }
         }
         
     }

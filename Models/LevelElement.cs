@@ -13,35 +13,52 @@ public abstract class LevelElement(int x, int y, char symbol, ConsoleColor color
     public Position Position = new Position(x, y);
     public char Symbol = symbol;
     public ConsoleColor CharColor = color;
-    private bool _isVisible = false;
 
-    
+    private bool IsVisible
+    {
+        get => this == LevelData.Player || IsInRadius(5);
+        set;
+    }
+
+
     /// <summary>
     /// Draws the element to the console if visible, otherwise draws empty space.
     /// </summary>
-    public void Draw()
+    public void Draw(bool clear = false)
     {
         
         Console.SetCursorPosition(Position.x,Position.y);
         Console.ForegroundColor = CharColor;
-        if(_isVisible) Console.Write(Symbol);
-        else Console.Write(" ");
+        Console.Write(clear ? " " : Symbol);
+        
         Console.ResetColor();
+    }
+
+    public virtual void Update()
+    {
+        if(IsVisible) Draw();
+        else Draw(true);
+    }
+
+    public bool IsInRadius(int radius)
+    {
+        return GetDistanceToPlayer() <= radius;
     }
 
     public void Move(Position direction)
     {
-        Hide();
-        Draw();
+        
+        Draw(true);
         Position += direction;
-        Show();
         Draw();
     }
 
-    public bool WillCollide(Position direction, List<LevelElement> elements)
+    public int GetDistanceToPlayer() => Math.Abs(Position.x - LevelData.Player.Position.x) + Math.Abs(Position.y - LevelData.Player.Position.y);
+    
+
+    public bool WillCollide(Position direction)
     {
-        return elements.Any(e => e.Position == Position + direction);
+        return LevelData.Elements.Any(e => e.Position == Position + direction);
     }
-    public void Hide() => _isVisible = false;
-    public void Show() => _isVisible = true;
+
 }
