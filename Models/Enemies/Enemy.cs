@@ -1,6 +1,8 @@
+using RougeLike.Interfaces;
+
 namespace RougeLike.Models.Enemies;
 
-public abstract class Enemy(int x, int y, char symbol, ConsoleColor color, int health, string name) : LevelElement(x, y, symbol, color)
+public abstract class Enemy(int x, int y, char symbol, ConsoleColor color, int health, string name) : LevelElement(x, y, symbol, color), IMovable
 {
     public int Health = health;
     public string Name = name;
@@ -19,7 +21,4 @@ public abstract class Enemy(int x, int y, char symbol, ConsoleColor color, int h
     }
 
     public abstract void Update(List<LevelElement> elements);
-
-
-
 }

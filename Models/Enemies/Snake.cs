@@ -4,6 +4,6 @@ public class Snake(int x, int y, char symbol, int health, string name) : Enemy(x
 {
     public override void Update(List<LevelElement> elements)
     {
-        return;
+        
     }
 }

@@ -24,20 +24,7 @@ public abstract class LevelElement(int x, int y, char symbol, ConsoleColor color
 
     private bool _isVisible;
 
-    public bool IsVisible
-    {
-        get => _isVisible;
-        private set
-        {
-            if (_isVisible == value)
-            {
-                return;
-            }
 
-            _isVisible = value;
-            Draw();
-        }
-    }
 
 
     /// <summary>
@@ -81,7 +68,7 @@ public abstract class LevelElement(int x, int y, char symbol, ConsoleColor color
     public bool WillCollide(Position direction, List<LevelElement> elements)
     {
         Position newPosition = Position + direction;
-        return elements.Any(element => element.Position == newPosition);
+        return elements.Any(element => element != this && element.Position == newPosition);
 
     }
 
@@ -100,7 +87,7 @@ public abstract class LevelElement(int x, int y, char symbol, ConsoleColor color
         }
         Console.SetCursorPosition(Position.X, Position.Y);
         Console.Write(" ");
-        IsVisible = false;
+
     }
     public void Show()
     {
@@ -108,7 +95,7 @@ public abstract class LevelElement(int x, int y, char symbol, ConsoleColor color
         {
             wall.FlagAsSeen();
         }
-        IsVisible = true;
+
         Draw();
     }
 }

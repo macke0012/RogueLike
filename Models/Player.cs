@@ -1,9 +1,12 @@
+using RougeLike.Interfaces;
+
 namespace RougeLike.Models;
 
 
 
-public class Player(int x, int y, char symbol) : LevelElement(x, y, symbol, ConsoleColor.Magenta)
+public class Player(int x, int y, char symbol) : LevelElement(x, y, symbol, ConsoleColor.Magenta), IMovable, IAlive
 {
+    public int Health { get; private set; } = 100;
     public void Update(List<LevelElement> elements)
     {
         Position direction = new()
@@ -108,4 +111,12 @@ public class Player(int x, int y, char symbol) : LevelElement(x, y, symbol, Cons
     }
 
 
+
+    public void TakeDamage(int damage)
+    {
+        Health -= damage;
+        if (Health < 0) Health = 0;
+    }
+
+    public bool IsDead() => Health == 0;
 }
