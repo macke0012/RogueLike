@@ -1,20 +1,20 @@
 namespace RougeLike.Models.Enemies;
 
-public class Rat(int x, int y, char symbol, int health, string name) : Enemy(x, y, symbol, ConsoleColor.Yellow, health, name)
+public class Rat : Enemy
 {
-    public override void Update()
+    public override string Name => "Rat";
+    public override Dice AttackDice { get; } = new(1, 6, 3);
+    public override Dice DefenceDice { get; } = new(1, 6, 1);
+
+    public Rat(int x, int y) : base(x, y, 'r', ConsoleColor.Red)
     {
-        Position direction = GetRandomDirection();
-        while (WillCollide(direction))
-        {
-            direction = GetRandomDirection();
-        }
-        
-        
-        Move(direction);
-        base.Update();
-        
+        HP = 10;
     }
 
-    
+    // Rat rör sig ett steg i slumpmässig riktning varje omgång.
+    public override void Update(LevelData level, Player player, MessageLog log)
+    {
+        Position direction = Position.Directions[Random.Shared.Next(Position.Directions.Length)];
+        TryMove(direction, level, player, log);
+    }
 }

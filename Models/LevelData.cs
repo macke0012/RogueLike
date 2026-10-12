@@ -4,48 +4,45 @@ namespace RougeLike.Models;
 
 public class LevelData
 {
-    private static readonly List<LevelElement> _elements = [];
+    private List<LevelElement> elements = [];
 
-    //Kan inte exponera det privata fältet och använda readonly samtidigt.
-    public static List<LevelElement> Elements => _elements;
-    public static Player Player => Elements.OfType<Player>().First();
-    
+    public IReadOnlyList<LevelElement> Elements => elements;
+    public Position PlayerStartPosition { get; private set; }
+    public int Height { get; private set; }
 
-    public static void Load(string path)
+    /// <summary>
+    /// Läser in banan tecken för tecken och skapar ett objekt för varje vägg/fiende.
+    /// </summary>
+    public void Load(string filename)
     {
-        string[] lines = File.ReadAllLines(path);
-        for(int y = 0; y < lines.Length; y++)
+        elements = [];
+        string[] lines = File.ReadAllLines(filename);
+        Height = lines.Length;
+
+        for (int y = 0; y < lines.Length; y++)
         {
             for (int x = 0; x < lines[y].Length; x++)
             {
-                char symbol = lines[y][x];
-                
-                LevelElement? element = null;
-                switch (symbol)
+                switch (lines[y][x])
                 {
+                    case '#':
+                        elements.Add(new Wall(x, y));
+                        break;
+                    case 'r':
+                        elements.Add(new Rat(x, y));
+                        break;
+                    case 's':
+                        elements.Add(new Snake(x, y));
+                        break;
                     case '@':
-                        element = new Player(x, y, symbol);
+                        PlayerStartPosition = new Position(x, y);
                         break;
-                    case 'S':
-                        element = new Snake(x, y,symbol,  10, "Snake");
-                        break;
-                    case 'R':
-                        element = new Rat(x, y, symbol, 5, "Rat");
-                        break;
-                    case '|' or '-':
-                        element = new Wall(x, y, symbol);
-                        break;
-                    
-                    
-                   
-                }
-                
-                if(element != null)
-                {
-                    
-                    _elements.Add(element);
                 }
             }
         }
     }
+
+    public LevelElement? GetElementAt(Position position) => elements.FirstOrDefault(e => e.Position == position);
+
+    public void Remove(LevelElement element) => elements.Remove(element);
 }

@@ -1,54 +1,35 @@
 namespace RougeLike.Models;
 
-
-
-public class Player(int x, int y, char symbol) : LevelElement(x, y, symbol, ConsoleColor.Magenta)
+public class Player(int x, int y) : LevelElement(x, y, '@', ConsoleColor.Yellow), ICombatant
 {
-    public void Update()
+    public const int VisionRange = 5;
+
+    public string Name => "Player";
+    public int HP { get; set; } = 100;
+    public Dice AttackDice { get; } = new(2, 6, 2);
+    public Dice DefenceDice { get; } = new(2, 6, 0);
+    public bool IsAlive => HP > 0;
+
+    public bool CanSee(LevelElement element) => Position.DistanceTo(element.Position) <= VisionRange;
+
+    /// <summary>
+    /// Flyttar spelaren ett steg i given riktning. Står en fiende i vägen attackeras den,
+    /// står en vägg i vägen avbryts förflyttningen.
+    /// </summary>
+    public void Move(Position direction, LevelData level, MessageLog log)
     {
-        Position direction = new();
-        do
+        if (direction == Position.None) return;
+
+        Position target = Position + direction;
+        switch (level.GetElementAt(target))
         {
-            direction = GetPlayerDirection();
-            if (!WillCollide(direction)) break;
-
-        } while (true);
-       
-        
-        if(Position.X + direction.X < 0 || Position.Y + direction.Y < 0) return;
-        //Erase old position
-        Move(direction);
-        
-
-    }
-    
-    
-
-    bool IsValidInput(ConsoleKey key)
-    {
-        return key == ConsoleKey.A || key == ConsoleKey.D || key == ConsoleKey.W || key == ConsoleKey.S ||
-               key == ConsoleKey.Spacebar;
-    }
-    
-    public Position GetPlayerDirection()
-    {
-        var input = Console.ReadKey(true).Key;
-        while (!IsValidInput(input))
-        {
-            input = Console.ReadKey(true).Key;
+            case Enemies.Enemy enemy:
+                Combat.Fight(this, enemy, log);
+                break;
+            case null:
+                Position = target;
+                break;
+            // Vägg: förflyttningen avbryts
         }
-            
-        return input switch
-        {
-            ConsoleKey.A => new Position(-1, 0),
-            ConsoleKey.D => new Position(1, 0),
-            ConsoleKey.W => new Position(0, -1),
-            ConsoleKey.S => new Position(0, 1),
-            ConsoleKey.Spacebar => new Position(0,0),
-            _ => throw new Exception("Invalid input")
-
-        };
     }
-    
-    
 }

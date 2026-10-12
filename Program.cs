@@ -1,16 +1,10 @@
-﻿using RougeLike.Models;
+using RougeLike;
 
-namespace RougeLike;
-
-class Program
+string levelFile = Path.Combine(AppContext.BaseDirectory, "Level1.txt");
+if (!File.Exists(levelFile))
 {
-    static LevelData levelData = new LevelData();
-
-    static void Main(string[] args)
-    {
-        Game game = new Game();
-        game.Start();
-    }
-
-
+    Console.WriteLine($"Could not find level file: {levelFile}");
+    return;
 }
+
+new Game().Start(levelFile);
