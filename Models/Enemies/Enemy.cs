@@ -9,15 +9,17 @@ public abstract class Enemy(int x, int y, char symbol, ConsoleColor color, int h
     {
         return Random.Shared.Next(4) switch
         {
-            0 => new Position(-1, 0),
-            1 => new Position(1, 0),
-            2 => new Position(0, -1),
-            3 => new Position(0, 1),
+            0 => new Position { X = -1, Y = 0 },
+            1 => new Position { X = 1, Y = 0 },
+            2 => new Position { X = 0, Y = -1 },
+            3 => new Position { X = 0, Y = 1 },
             _ => throw new Exception("Invalid Range")
 
         };
     }
 
-    
-   
+    public abstract void Update(List<LevelElement> elements);
+
+
+
 }

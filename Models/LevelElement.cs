@@ -1,64 +1,114 @@
 namespace RougeLike.Models;
 
-public record struct Position(int x, int y)
+public record struct Position()
 {
-    public int X = x;
-    public int Y = y;
-    
-    public static Position operator +(Position a, Position b) => new Position(a.x + b.x, a.y + b.y);
+    public required int X;
+    public required int Y;
+
+    public static Position operator +(Position a, Position b) => new Position()
+    {
+        X = a.X + b.X,
+        Y = a.Y + b.Y
+    };
 }
 
 public abstract class LevelElement(int x, int y, char symbol, ConsoleColor color)
 {
-    public Position Position = new Position(x, y);
+    public Position Position = new Position()
+    {
+        X = x,
+        Y = y
+    };
     public char Symbol = symbol;
     public ConsoleColor CharColor = color;
 
-    private bool IsVisible
+    private bool _isVisible;
+
+    public bool IsVisible
     {
-        get => this == LevelData.Player || IsInRadius(5);
-        set;
+        get => _isVisible;
+        private set
+        {
+            if (_isVisible == value)
+            {
+                return;
+            }
+
+            _isVisible = value;
+            Draw();
+        }
     }
 
 
     /// <summary>
     /// Draws the element to the console if visible, otherwise draws empty space.
     /// </summary>
-    public void Draw(bool clear = false)
+    public virtual void Draw()
     {
-        
-        Console.SetCursorPosition(Position.x,Position.y);
+
+        Console.SetCursorPosition(Position.X, Position.Y);
         Console.ForegroundColor = CharColor;
-        Console.Write(clear ? " " : Symbol);
-        
+        Console.Write(Symbol);
         Console.ResetColor();
     }
 
-    public virtual void Update()
+    private void CleanOldPosition()
     {
-        if(IsVisible) Draw();
-        else Draw(true);
+        Console.SetCursorPosition(Position.X, Position.Y);
+        Console.Write(" ");
     }
 
-    public bool IsInRadius(int radius)
-    {
-        return GetDistanceToPlayer() <= radius;
-    }
+
+
 
     public void Move(Position direction)
     {
-        
-        Draw(true);
+        CleanOldPosition();
         Position += direction;
+
+
+    }
+
+
+    public int GetDistanceSquaredToPlayer(Player player)
+    {
+        int dx = player.Position.X - Position.X;
+        int dy = player.Position.Y - Position.Y;
+        return dx * dx + dy * dy;
+    }
+
+
+    public bool WillCollide(Position direction, List<LevelElement> elements)
+    {
+        Position newPosition = Position + direction;
+        return elements.Any(element => element.Position == newPosition);
+
+    }
+
+    public void Hide()
+    {
+        if (this is Wall wall)
+        {
+            if (wall.Seen)
+            {
+                return;
+            }
+        }
+        if (this is Player)
+        {
+            return;
+        }
+        Console.SetCursorPosition(Position.X, Position.Y);
+        Console.Write(" ");
+        IsVisible = false;
+    }
+    public void Show()
+    {
+        if (this is Wall wall)
+        {
+            wall.FlagAsSeen();
+        }
+        IsVisible = true;
         Draw();
     }
-
-    public int GetDistanceToPlayer() => Math.Abs(Position.x - LevelData.Player.Position.x) + Math.Abs(Position.y - LevelData.Player.Position.y);
-    
-
-    public bool WillCollide(Position direction)
-    {
-        return LevelData.Elements.Any(e => e.Position == Position + direction);
-    }
-
 }

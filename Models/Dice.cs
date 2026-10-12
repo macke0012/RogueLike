@@ -13,7 +13,7 @@ public class Dice(int numberOfDice, int sidesPerDice, int modifier)
         int sum = 0;
         for (int i = 0; i < NumberOfDice; i++)
         {
-            sum += Random.Shared.Next(1, SidesPerDice);
+            sum += Random.Shared.Next(1, SidesPerDice + 1);
         }
         return sum + Modifier;
     }
